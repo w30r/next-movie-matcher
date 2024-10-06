@@ -20,6 +20,8 @@ const movieSchema = new mongoose.Schema({
     No_of_Votes: Number,
     Gross: String,
   },
+  isMatch: { type: Boolean, default: false },
+  user_ids: [String],
 });
 
 const Movie = mongoose.models.Movie || mongoose.model("Movie", movieSchema);

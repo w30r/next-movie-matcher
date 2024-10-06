@@ -9,6 +9,9 @@ import { useRouter } from "next/navigation";
 export default function MatchingPage() {
   const [movies, setMovies] = useState([]);
   const router = useRouter();
+  // const urlParams = new URLSearchParams(window.location.search);
+  // const user = urlParams.get("user");
+
   async function getMovies() {
     try {
       const res = await axios.get("http://localhost:3000/api/movies");
@@ -83,7 +86,7 @@ export default function MatchingPage() {
         <svg
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute -z-10 blur-sm top-3/4 left-1/4 -z-10"
+          className="absolute -z-10 blur-sm top-3/4 left-1/4 "
         >
           <path
             fill="#0ea5e9 "
@@ -97,6 +100,7 @@ export default function MatchingPage() {
         <h1 className="text-5xl font-bold text-pink-500 underline -mt-3">
           MATCH!
         </h1>
+        <h1>Hello, </h1>
         <h1>Start choose movies that you wanna watch!</h1>
       </div>
       <div className="flex flex-col items-center mt-2 text-black h-2/3 ">
@@ -139,7 +143,9 @@ export default function MatchingPage() {
             className="blur-0 self-center mb-6 rounded-lg shadow-md w-auto h-[200px]"
           />
           <h2 className="text-2xl font-bold leading-[0.9]">
-            {movies.length === 0 ? "Loading..." : `${movies[0]?.row.Series_Title} (${movies[0]?.row.Released_Year})`}
+            {movies.length === 0
+              ? "Loading..."
+              : `${movies[0]?.row.Series_Title} (${movies[0]?.row.Released_Year})`}
           </h2>
           <p className="text-sm opacity-80">By {movies[0]?.row.Director}</p>
           <p className="text-black rounded-lg mt-2 mb-2 bg-purple-500/50 outline outline-black/50 shadow-sm outline-1 font-semibold w-auto px-4  text-center">
