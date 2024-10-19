@@ -20,9 +20,24 @@ export async function GET() {
 export async function POST(req) {
   await connectToDB();
   const body = await req.json();
-  if (!body.title) {
+  if (!body.Series_Title) {
     return NextResponse.json({ message: "Title is required" }, { status: 400 });
   }
-  const movie = await MatchedMovie.create({ body });
-  return NextResponse.json({ message: "New matched movie!", data: movie });
+
+  const existingMovie = await MatchedMovie.findOne({
+    Series_Title: body.Series_Title,
+    userIDs: body.userIDs,
+  });
+  if (existingMovie) {
+    return NextResponse.json(
+      { message: "User has already liked this movie" },
+      { status: 200 }
+    );
+  }
+
+  const movie = await MatchedMovie.create(body);
+  return NextResponse.json({
+    message: "Saved a new movie",
+    data: movie.Series_Title,
+  });
 }

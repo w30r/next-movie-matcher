@@ -5,9 +5,17 @@ import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
 import { MdDone } from "react-icons/md";
 import { useRouter } from "next/navigation";
+import { easeIn, easeOut, motion } from "framer-motion";
 
 export default function MatchingPage() {
   const [movies, setMovies] = useState([]);
+  // const [currentIndex, setCurrentIndex] = useState(
+  //   () => JSON.parse(localStorage.getItem("currentIndex")) || 0
+  // );
+  const [currentIndex, setCurrentIndex] = useState(0);
+
+  const [username, setUsername] = useState("");
+
   const router = useRouter();
   // const urlParams = new URLSearchParams(window.location.search);
   // const user = urlParams.get("user");
@@ -20,9 +28,60 @@ export default function MatchingPage() {
       console.log(error);
     }
   }
+
+  async function getUsername() {
+    try {
+      const res = await axios.get("http://localhost:3000/api/username");
+      setUsername(res.data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
+  async function testUpdate() {
+    try {
+      const res = await axios.get(`http://localhost:3000/api/movies/${movies[currentIndex]._id}`);
+      console.log(res.data);
+    } catch (err) {
+      console.error(err.message);
+    }
+  }
+
   useEffect(() => {
     getMovies();
-  }, []);
+    getUsername();
+    localStorage.setItem("currentIndex", JSON.stringify(currentIndex));
+  }, [currentIndex]);
+
+  async function handleLikeMovie(currentIndex) {
+    console.log("Liked a movie: ", movies[currentIndex].row.Series_Title);
+    try {
+      const res = await axios.post("http://localhost:3000/api/markedmovies", {
+        Poster_Link: movies[currentIndex].row.Poster_Link,
+        Series_Title: movies[currentIndex].row.Series_Title,
+        Released_Year: movies[currentIndex].row.Released_Year,
+        Certificate: movies[currentIndex].row.Certificate,
+        Runtime: movies[currentIndex].row.Runtime,
+        Genre: movies[currentIndex].row.Genre,
+        IMDB_Rating: movies[currentIndex].row.IMDB_Rating,
+        Overview: movies[currentIndex].row.Overview,
+        Meta_score: movies[currentIndex].row.Meta_score,
+        Director: movies[currentIndex].row.Director,
+        Star1: movies[currentIndex].row.Star1,
+        Star2: movies[currentIndex].row.Star2,
+        Star3: movies[currentIndex].row.Star3,
+        Star4: movies[currentIndex].row.Star4,
+        No_of_Votes: movies[currentIndex].row.No_of_Votes,
+        Gross: movies[currentIndex].row.Gross,
+        userIDs: [username],
+      });
+      console.log(`res.data: ${res.data.message}`);
+    } catch (error) {
+      console.log(error);
+    }
+    console.log(`Liked movie saved.`);
+  }
+  // async function handleDislikeMovie(id) {}
 
   return (
     <div className="p-8 overflow-auto h-screen w-screen relative duration-150">
@@ -96,14 +155,30 @@ export default function MatchingPage() {
         </svg>
       </>
       <div className="h-1/6">
-        <h1 className="text-5xl font-bold text-sky-500">MOVIE</h1>
-        <h1 className="text-5xl font-bold text-pink-500 underline -mt-3">
-          MATCH!
-        </h1>
-        <h1>Hello, </h1>
-        <h1>Start choose movies that you wanna watch!</h1>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: easeOut }}
+        >
+          <h1 className="text-5xl font-bold text-sky-500">MOVIE</h1>
+          <h1 className="text-5xl font-bold text-pink-500 underline -mt-3">
+            MATCH!
+          </h1>
+          <h1 className="font-semibold mt-1">
+            Hello, {username.toUpperCase()}!
+          </h1>
+          {/* <h1 className="font-semibold mt-1">
+          here: {movies?.[currentIndex]?.row?.Series_Title}
+        </h1> */}
+          <h1>Start choose movies that you wanna watch!</h1>
+        </motion.div>
       </div>
-      <div className="flex flex-col items-center mt-2 text-black h-2/3 ">
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.5, ease: easeOut }}
+        className="flex flex-col items-center mt-2 text-black h-2/3 "
+      >
         <div
           id="card"
           className="bg-black/60 text-white backdrop-blur-lg h-full w-full sm:w-2/3 md:w-1/2 p-4 rounded-lg shadow flex flex-col justify-center items-start"
@@ -113,30 +188,27 @@ export default function MatchingPage() {
             className="flex justify-between mb-3 -mt-4 items-center w-full"
           >
             <button
-              onClick={() =>
-                setMovies((prevMovies) => [
-                  ...prevMovies.slice(1),
-                  prevMovies[0],
-                ])
-              }
+              onClick={() => {
+                const newIndex = (currentIndex + 1) % movies.length;
+                setCurrentIndex(newIndex);
+              }}
               className="mt-4 outline outline-2 outline-white bg-pink-500 hover:bg-pink-700 duration-150 hover:scale-105 text-white font-bold p-4 text-lg rounded-full"
             >
               <RxCross2 />
             </button>
             <button
-              onClick={() =>
-                setMovies((prevMovies) => [
-                  ...prevMovies.slice(1),
-                  prevMovies[0],
-                ])
-              }
+              onClick={() => {
+                const newIndex = (currentIndex + 1) % movies.length;
+                setCurrentIndex(newIndex);
+                handleLikeMovie(currentIndex);
+              }}
               className="mt-4 outline outline-2 outline-white bg-green-600 hover:bg-green-700 duration-150 hover:scale-105 text-white font-bold p-4 text-lg rounded-full"
             >
               <MdDone />
             </button>
           </div>
           <Image
-            src={movies[0]?.row.Poster_Link}
+            src={movies[currentIndex]?.row.Poster_Link}
             alt="poster"
             height={2000}
             width={2000}
@@ -145,30 +217,38 @@ export default function MatchingPage() {
           <h2 className="text-2xl font-bold leading-[0.9]">
             {movies.length === 0
               ? "Loading..."
-              : `${movies[0]?.row.Series_Title} (${movies[0]?.row.Released_Year})`}
+              : `${movies[currentIndex]?.row.Series_Title} (${movies[currentIndex]?.row.Released_Year})`}
           </h2>
-          <p className="text-sm opacity-80">By {movies[0]?.row.Director}</p>
+          <p className="text-sm opacity-80">
+            By {movies[currentIndex]?.row.Director}
+          </p>
           <p className="text-black rounded-lg mt-2 mb-2 bg-purple-500/50 outline outline-black/50 shadow-sm outline-1 font-semibold w-auto px-4  text-center">
-            {movies[0]?.row.Genre}
+            {movies[currentIndex]?.row.Genre}
           </p>
           <p className="text-sm opacity-80">
-            Starred by {movies[0]?.row.Star1}, {movies[0]?.row.Star2},{" "}
-            {movies[0]?.row.Star3}
+            Starred by {movies[currentIndex]?.row.Star1},{" "}
+            {movies[currentIndex]?.row.Star2}, {movies[currentIndex]?.row.Star3}
           </p>
           <p className="text-lg mt-4 opacity-90 underline">Overview:</p>
           <p className="text-sm opacity-80 text-justify">
-            {movies[0]?.row.Overview}
+            {movies[currentIndex]?.row.Overview}
           </p>
         </div>
-      </div>
-      <div className="mt-4 z-20  flex justify-center h-1/6 py-8">
+      </motion.div>
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, delay: 0.8, ease: easeOut }}
+        className="mt-4 z-20  flex justify-center h-1/6 py-8"
+      >
         <button
           onClick={() => router.push("/matches")}
           className="bg-gradient-to-tr from-sky-500 text-xl outline outline-black/80 text-black hover:scale-105 duration-200 outline-2 to-pink-500 p-3 py-1 rounded-lg"
         >
           View Matched Movies
         </button>
-      </div>
+      </motion.div>
+      <button onClick={() => testUpdate()}>TEST UPDATE</button>
     </div>
   );
 }

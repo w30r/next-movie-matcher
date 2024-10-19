@@ -2,7 +2,7 @@
 
 export default function Home() {
   function goToLoginPage() {
-    window.location.href = "/login";
+    window.location.href = `/login`;
   }
   return (
     <div>

@@ -2,23 +2,34 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 export default function matches() {
   const [matches, setMatches] = useState([]);
 
-  useEffect(() => {
-    async function getMatches() {
-      try {
-        const res = await axios.get("http://localhost:3000/api/matchedmovies");
-        setMatches(res.data.matchedmovies);
-        console.log("🚀 ~ matches ~ matches:", matches);
-      } catch (error) {
-        console.log(error);
-      }
+  async function getMatches() {
+    try {
+      const res = await axios.get("http://localhost:3000/api/markedmovies");
+      setMatches(res.data.matchedmovies);
+    } catch (error) {
+      console.log(error);
     }
+  }
+
+  function createGoogleSearchURL(sentence, year) {
+    // Encode the sentence to make it URL-safe
+    const string = sentence + " " + year;
+    const query = encodeURIComponent(string);
+    // Create the Google search URL
+    const googleSearchURL = `https://www.google.com/search?q=${query}`;
+    return googleSearchURL;
+  }
+
+  useEffect(() => {
     getMatches();
   }, []);
 
+  console.log("🚀 ~ matches ~ matches:", matches);
   return (
     <div className="p-8 text-white">
       <>
@@ -36,14 +47,32 @@ export default function matches() {
       </>
       <>
         <div className="flex flex-wrap gap-4">
-          {matches.map((movie) => (
-            <div
+          {matches.map((movie, index) => (
+            <motion.div
               key={movie._id}
-              className="flex flex-col justify-center items-center bg-white/10 w-72 h-96 rounded-lg p-4 hover:scale-105 duration-150"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: index * 0.2 }}
+              className="mt-10 flex flex-col justify-center items-center bg-white/10 w-72 h-auto rounded-lg p-4 hover:scale-105 duration-150"
             >
-              <h1 className="text-xl">{movie.title}</h1>
-              <p className="text-sm">{movie.year}</p>
-            </div>
+              <h1 className="text-xl">{movie.Series_Title}</h1>
+              <p className="text-sm">{movie.Released_Year}</p>
+              <motion.button
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                onClick={() =>
+                  window.open(
+                    createGoogleSearchURL(
+                      movie.Series_Title,
+                      movie.Released_Year
+                    ),
+                    "_blank"
+                  )
+                }
+              >
+                Search
+              </motion.button>
+            </motion.div>
           ))}
         </div>
       </>

@@ -34,3 +34,4 @@ export async function PATCH(req, { params }) {
   );
   return NextResponse.json({ msg: "Updated a movie", data: movie });
 }
+

@@ -18,6 +18,7 @@ export async function GET(req, authenticateToken) {
   return NextResponse.json({ movies });
 }
 
+
 // export async function POST(req) {
 //   connectToDB();
 //   const body = await req.json();

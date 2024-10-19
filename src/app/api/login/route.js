@@ -1,6 +1,5 @@
 import jwt from "jsonwebtoken";
 
-
 export async function POST(req) {
   const { username } = await req.json();
   const accessToken = jwt.sign({ username }, process.env.JWT_SECRET, {
@@ -11,7 +10,7 @@ export async function POST(req) {
     status: 200,
     headers: {
       "Content-Type": "application/json",
-      "Set-Cookie": `accessToken=${accessToken}; Max-Age=3600; HttpOnly; Secure; SameSite=Strict`,
+      "Set-Cookie": `username=${username}; Max-Age=3600; HttpOnly; Secure; SameSite=Strict`,
     },
   });
 }
