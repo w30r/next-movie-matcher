@@ -40,7 +40,9 @@ export default function MatchingPage() {
 
   async function testUpdate() {
     try {
-      const res = await axios.get(`http://localhost:3000/api/movies/${movies[currentIndex]._id}`);
+      const res = await axios.get(
+        `http://localhost:3000/api/movies/${movies[currentIndex]._id}`
+      );
       console.log(res.data);
     } catch (err) {
       console.error(err.message);
@@ -54,34 +56,11 @@ export default function MatchingPage() {
   }, [currentIndex]);
 
   async function handleLikeMovie(currentIndex) {
-    console.log("Liked a movie: ", movies[currentIndex].row.Series_Title);
-    try {
-      const res = await axios.post("http://localhost:3000/api/markedmovies", {
-        Poster_Link: movies[currentIndex].row.Poster_Link,
-        Series_Title: movies[currentIndex].row.Series_Title,
-        Released_Year: movies[currentIndex].row.Released_Year,
-        Certificate: movies[currentIndex].row.Certificate,
-        Runtime: movies[currentIndex].row.Runtime,
-        Genre: movies[currentIndex].row.Genre,
-        IMDB_Rating: movies[currentIndex].row.IMDB_Rating,
-        Overview: movies[currentIndex].row.Overview,
-        Meta_score: movies[currentIndex].row.Meta_score,
-        Director: movies[currentIndex].row.Director,
-        Star1: movies[currentIndex].row.Star1,
-        Star2: movies[currentIndex].row.Star2,
-        Star3: movies[currentIndex].row.Star3,
-        Star4: movies[currentIndex].row.Star4,
-        No_of_Votes: movies[currentIndex].row.No_of_Votes,
-        Gross: movies[currentIndex].row.Gross,
-        userIDs: [username],
-      });
-      console.log(`res.data: ${res.data.message}`);
-    } catch (error) {
-      console.log(error);
-    }
-    console.log(`Liked movie saved.`);
+    const res = await axios.put(
+      `http://localhost:3000/api/movies/${movies[currentIndex]._id}`
+    );
+    console.log(res);
   }
-  // async function handleDislikeMovie(id) {}
 
   return (
     <div className="p-8 overflow-auto h-screen w-screen relative duration-150">
