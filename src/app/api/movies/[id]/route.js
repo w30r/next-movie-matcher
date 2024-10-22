@@ -1,7 +1,6 @@
 import Movie from "@/app/models/Movie";
 import { connectToDB } from "../route";
 import { NextResponse } from "next/server";
-import mongoose from "mongoose";
 
 export async function GET(req, { params }) {
   connectToDB();

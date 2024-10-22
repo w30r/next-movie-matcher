@@ -1,7 +1,6 @@
 import Movie from "@/app/models/Movie";
 import mongoose from "mongoose";
 import { NextResponse } from "next/server";
-import authenticateToken from "@/app/api/login/route";
 
 export async function connectToDB() {
   try {

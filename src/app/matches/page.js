@@ -3,17 +3,35 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { FaArrowAltCircleLeft } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 
 export default function matches() {
+  const [likes, setLikes] = useState([]);
+  const [matchWith, setMatchWith] = useState("");
   const [matches, setMatches] = useState([]);
+  const [movies, setMovies] = useState([]);
 
-  async function getMatches() {
+  // TODO Get liked movies
+  async function getLikes() {
     try {
-      const res = await axios.get("http://localhost:3000/api/markedmovies");
-      setMatches(res.data.matchedmovies);
+      const res = await axios.get(
+        `http://localhost:3000/api/movies/likes/${matchWith}`
+      );
+      setLikes(res.data.likes);
+      console.log(res.data);
     } catch (error) {
       console.log(error);
     }
+  }
+
+  async function getMatches() {
+    const sapa = matchWith;
+    const res = await axios.get(
+      `http://localhost:3000/api/movies/match/${sapa}`
+    );
+    setMatches(res.data.movie);
+    console.log("🚀 ~ getMatches ~ res.data:", res.data);
   }
 
   function createGoogleSearchURL(sentence, year) {
@@ -26,12 +44,11 @@ export default function matches() {
   }
 
   useEffect(() => {
+    getLikes();
     getMatches();
-  }, []);
-
-  console.log("🚀 ~ matches ~ matches:", matches);
+  }, [matchWith]);
   return (
-    <div className="p-8 text-white">
+    <div className="p-8 text-white bg-black h-screen">
       <>
         <button
           onClick={() => window.history.back()}
@@ -42,38 +59,86 @@ export default function matches() {
         </button>
       </>
       <>
-        <h1 className="text-3xl">Matched</h1>
+        <h1 className="text-3xl">Liked</h1>
         <h1 className="text-5xl -mt-2">Movies! 🎉</h1>
       </>
+      <div className="mt-6">
+        Who you wanna match with?
+        <div className="flex gap-4 mt-2">
+          <Input
+            value={matchWith}
+            onChange={(e) => setMatchWith(e.target.value)}
+            type="text"
+            placeholder="Search"
+            className="w-[250px]"
+          />
+          <Button>Search</Button>
+        </div>
+      </div>
       <>
         <div className="flex flex-wrap gap-4">
-          {matches.map((movie, index) => (
-            <motion.div
-              key={movie._id}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: index * 0.2 }}
-              className="mt-10 flex flex-col justify-center items-center bg-white/10 w-72 h-auto rounded-lg p-4 hover:scale-105 duration-150"
-            >
-              <h1 className="text-xl">{movie.Series_Title}</h1>
-              <p className="text-sm">{movie.Released_Year}</p>
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.9 }}
-                onClick={() =>
-                  window.open(
-                    createGoogleSearchURL(
-                      movie.Series_Title,
-                      movie.Released_Year
-                    ),
-                    "_blank"
-                  )
-                }
+          {matchWith.length <= 0 ? (
+            likes.map((like, index) => (
+              <motion.div
+                key={like.row._id}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: index * 0.2 }}
+                className="mt-10 flex flex-col justify-center items-center bg-white/10 w-72 h-auto rounded-lg p-4 hover:scale-105 duration-150"
               >
-                Search
-              </motion.button>
-            </motion.div>
-          ))}
+                <h1 className="text-xl">{like.row.Series_Title}</h1>
+                <p className="text-sm">{like.row.Released_Year}</p>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() =>
+                    window.open(
+                      createGoogleSearchURL(
+                        like.row.Series_Title,
+                        like.row.Released_Year
+                      ),
+                      "_blank"
+                    )
+                  }
+                >
+                  Search
+                </motion.button>
+              </motion.div>
+            ))
+          ) : (
+            <div>
+              <h1 className="mt-10">
+                You and {matchWith} liked these movies! 👏🏻
+              </h1>
+              {matches.map((like, index) => (
+                <motion.div
+                  key={like.row._id}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.5, delay: index * 0.2 }}
+                  className="mt-10 flex flex-col justify-center items-center bg-white/10 w-72 h-auto rounded-lg p-4 hover:scale-105 duration-150"
+                >
+                  <h1 className="text-xl">{like.row.Series_Title}</h1>
+                  <p className="text-sm">{like.row.Released_Year}</p>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() =>
+                      window.open(
+                        createGoogleSearchURL(
+                          like.row.Series_Title,
+                          like.row.Released_Year
+                        ),
+                        "_blank"
+                      )
+                    }
+                  >
+                    Search
+                  </motion.button>
+                </motion.div>
+              ))}
+            </div>
+          )}
         </div>
       </>
     </div>

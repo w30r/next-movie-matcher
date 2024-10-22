@@ -5,7 +5,9 @@ import axios from "axios";
 import { RxCross2 } from "react-icons/rx";
 import { MdDone } from "react-icons/md";
 import { useRouter } from "next/navigation";
-import { easeIn, easeOut, motion } from "framer-motion";
+import { easeOut, motion } from "framer-motion";
+import { Button } from "@/components/ui/button";
+import { ChevronRightIcon } from "@radix-ui/react-icons";
 
 export default function MatchingPage() {
   const [movies, setMovies] = useState([]);
@@ -40,7 +42,7 @@ export default function MatchingPage() {
 
   async function testUpdate() {
     try {
-      const res = await axios.get(
+      const res = await axios.put(
         `http://localhost:3000/api/movies/${movies[currentIndex]._id}`
       );
       console.log(res.data);
@@ -63,13 +65,13 @@ export default function MatchingPage() {
   }
 
   return (
-    <div className="p-8 overflow-auto h-screen w-screen relative duration-150">
+    <div className="bg-black text-white p-8 overflow-auto h-screen w-screen relative duration-150">
       <>
         <svg
           id="blobs"
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute -z-10 blur-md top-1/2 right-1/2"
+          className="absolute -z-0 blur-md top-1/2 right-1/2"
         >
           <path
             fill="#0ea5e9 "
@@ -80,7 +82,7 @@ export default function MatchingPage() {
         <svg
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute -z-10 blur-md top-36 left-3/4"
+          className="absolute -z-0 blur-md top-36 left-3/4"
         >
           <path
             fill="#0ea5e9 "
@@ -91,7 +93,7 @@ export default function MatchingPage() {
         <svg
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute -z-10 blur-md top-1/4 right-1/4"
+          className="absolute -z-0 blur-md top-1/4 right-1/4"
         >
           <path
             fill="#ec4899"
@@ -102,7 +104,7 @@ export default function MatchingPage() {
         <svg
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute -z-10 blur-md top-1/2 left-1/4"
+          className="absolute -z-0 blur-md top-1/2 left-1/4"
         >
           <path
             fill="#ec4899"
@@ -113,7 +115,7 @@ export default function MatchingPage() {
         <svg
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute -z-10 blur-md top-3/4 right-1/4"
+          className="absolute -z-0 blur-md top-3/4 right-1/4"
         >
           <path
             fill="#0ea5e9 "
@@ -124,7 +126,7 @@ export default function MatchingPage() {
         <svg
           viewBox="0 0 200 200"
           xmlns="http://www.w3.org/2000/svg"
-          className="absolute -z-10 blur-sm top-3/4 left-1/4 "
+          className="absolute -z-0 blur-sm top-3/4 left-1/4 "
         >
           <path
             fill="#0ea5e9 "
@@ -212,6 +214,22 @@ export default function MatchingPage() {
           <p className="text-sm opacity-80 text-justify">
             {movies[currentIndex]?.row.Overview}
           </p>
+          <div className="flex justify-around w-full mt-10">
+            <Button
+              onClick={() => setCurrentIndex(currentIndex - 1)}
+              className="text-pink-500 font-semibold bg-transparent outline-1 outline-white outline rounded p-2 "
+            >
+              <ChevronRightIcon className="h-3 w-3 transform rotate-180" />
+              Go back
+            </Button>
+            <Button
+              onClick={() => setCurrentIndex(currentIndex + 1)}
+              className="text-green-500 font-semibold bg-transparent outline-1 outline-white outline rounded p-2 "
+            >
+              Next movie
+              <ChevronRightIcon className="h-3 w-3 " />
+            </Button>
+          </div>
         </div>
       </motion.div>
       <motion.div
